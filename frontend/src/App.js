@@ -1,25 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import axios from "axios";
 
-function App() {
+const SearchPage = () => {
+  const [query, setQuery] = useState("");
+  const [searchResults, setSearchResults] = useState(null);
+
+  const handleSearch = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/search/${query}`);
+      setSearchResults(response.data);
+      console.log(response);
+    } catch (error) {
+      console.error(query,"Error searching:", error.response?.data || error.message);
+  
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Board Game Search</h1>
+      <div>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Enter your search query"
+        />
+        <button onClick={handleSearch}>Search</button>
+      </div>
+      {searchResults && (
+        <div>
+          <h2>Search Results:</h2>
+          <pre>{JSON.stringify(searchResults, null, 2)}</pre>
+        </div>
+      )}
     </div>
   );
-}
+};
 
-export default App;
+export default SearchPage;
