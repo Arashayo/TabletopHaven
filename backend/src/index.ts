@@ -9,8 +9,8 @@ import { gameDetails } from "./bggAPI/gameDetails";
 import { bggAPI } from "./controllers/bggAPI";
 import pgSession from 'connect-pg-simple';
 import { Pool } from 'pg';
-const addGame = require('./gameManagement/addGame.js');
-
+import { addGame } from './gameManagement/addGame'
+ 
 require('dotenv').config();
 console.log('PostgreSQL connection settings:', {
   user: process.env.DB_USER,
