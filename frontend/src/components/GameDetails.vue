@@ -72,8 +72,17 @@ export default {
       }
     },
 
-    addToShelf() {
-      // Add button logic
+    async addToShelf() {
+      try {
+        // TO DO:
+        //Change the "1" below to ACTUAL userId 
+        const response = await axios.post(`http://localhost:3000/addgame/1/${this.gameData.id}`);
+        console.log(response.data, "sss"); 
+
+      } catch (error) {
+        console.error('Error adding game to shelf:', error);
+
+      }
     },
   },
 };

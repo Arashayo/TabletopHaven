@@ -9,6 +9,7 @@ import { gameDetails } from "./bggAPI/gameDetails";
 import { bggAPI } from "./controllers/bggAPI";
 import pgSession from 'connect-pg-simple';
 import { Pool } from 'pg';
+const addGame = require('./gameManagement/addGame.js');
 
 require('dotenv').config();
 console.log('PostgreSQL connection settings:', {
@@ -33,12 +34,14 @@ app.use(express.static('public'));
 
 app.use(cors({
   origin: 'http://localhost:8081', // Your frontend URL
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // allow these methods
+  allowedHeaders: ['Content-Type', 'Authorization'] // allow these headers
 }));
 
 app.use(gameDetails);
 app.use(bggAPI);
-
+app.post('/addgame/:userId/:gameId', addGame);
 
 app.use(session({
   store: new PgSession({
