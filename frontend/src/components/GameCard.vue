@@ -6,14 +6,18 @@
     <div v-else-if="error" class="game-card">
       Error loading game details: {{ error }}
     </div>
-    <div v-else class="game-card">
+    <div v-else class="waves-effect waves-teal game-card">
       <div class="game-image-container">
         <img :src="gameData.image" alt="Game image" class="game-image" />
       </div>
-      <h2 class="game-title" :style="{ fontSize: adjustFontSize(gameData.name) }">{{ gameData.name }}</h2>
-      <h3 class="game-year">({{ gameData.year }})</h3>
-      <div v-if="averageRating !== null">Rating: {{ averageRating.toFixed(1) }}</div>
-      <div>Players: {{ gameData.min_players }} - {{ gameData.max_players }}</div>
+      <div class="title-container">
+        <h2 class="game-title" :style="{ fontSize: adjustFontSize(gameData.name) }">{{ gameData.name }}</h2>
+        <h3 class="game-year">({{ gameData.year }})</h3>
+      </div>
+      <div class="rating-players-container">
+        <div class="rating">Rating: {{ averageRating !== null ? averageRating.toFixed(1) : 'N/A' }}</div>
+        <div class="players">Players: {{ gameData.min_players }} - {{ gameData.max_players }}</div>
+      </div>
     </div>
   </router-link>
 </template>
@@ -65,19 +69,16 @@ export default {
     },
 
     adjustFontSize(title) {
-      if (title.length > 28) {
-        return '14px';
+      if (title.length > 23) {
+        return '16px';
       }
-      else if (title.length > 23) {
-        return '18px';
-      }
+      
       else if (title.length > 19) {
-        return '22px';
+        return '20px';
       }
-      else if (title.length > 16) { // Adjust the number based on your needs
-        return '24px'; // Smaller font size for longer titles
-      } 
-
+      else if (title.length > 16) {
+        return '24px';
+      }
       return '30px';
     },
   },
@@ -91,17 +92,17 @@ export default {
 }
 
 .game-card {
-    height: 350px;
-    width: 250px !important;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    word-wrap: break-word;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border-radius: 10px;
-    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.5);
+  height: 350px;
+  width: 250px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  word-wrap: break-word;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 10px;
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.5);
 }
 
 .game-card:hover {
@@ -126,14 +127,39 @@ export default {
     border-radius: 4px;
 }
 
+.title-container {
+  text-align: center;
+  margin-top: 10px;
+}
+
 .game-title {
-    font-size: 30px; 
+    font-size: 30px;
     margin-top: 0.5rem;
     margin-bottom: 2px;
+    overflow: hidden; /* Hide any overflow */
+    text-overflow: ellipsis; /* Add ellipsis (...) for overflow text */
 }
 
 .game-year {
   font-size: 18px;
-  margin-top: 0px
+  margin-top: 0px;
 }
+
+.rating-players-container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0px;
+}
+
+.rating,
+.players {
+  text-align: center;
+  font-size: 14px; /* Adjust as needed */
+}
+
+.players {
+  margin-top: 0px;
+  margin-bottom: 2rem;
+}
+
 </style>
