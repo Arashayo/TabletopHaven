@@ -6,7 +6,7 @@
     <div v-else-if="error" class="game-card">
       Error loading game details: {{ error }}
     </div>
-    <div v-else class="waves-effect waves-teal game-card">
+    <div v-else class="game-card">
       <div class="game-image-container">
         <img :src="gameData.image" alt="Game image" class="game-image" />
       </div>
