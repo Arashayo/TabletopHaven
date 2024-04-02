@@ -14,12 +14,12 @@
 <script>
 import MainNavbar from '@/components/MainNavbar.vue';
 import LeftMenu from '@/components/LeftMenu.vue';
-
 export default {
   components: {
     MainNavbar,
     LeftMenu,
   },
+
 }
 </script>
 

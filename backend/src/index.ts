@@ -4,6 +4,7 @@ import session from 'express-session';
 import passport from 'passport';
 import './passport-setup';
 import cors from 'cors';
+import { Server, Socket } from 'socket.io';
 
 import { gameDetails } from "./bggAPI/gameDetails";
 import { bggAPI } from "./controllers/bggAPI";
@@ -22,6 +23,7 @@ console.log('PostgreSQL connection settings:', {
 const path = require('path');
 const PORT = 3000;
 const app = express();
+const server = http.createServer(app)
 
 const PgSession = pgSession(session);
 const sessionSecret = process.env.SESSION_SECRET;
@@ -39,9 +41,35 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'] // allow these headers
 }));
 
+//////////////////////////////////////////////////////////////
+
+// CZAT
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:8081"
+  }
+});
+
+
+const test = io.of("/group/3");
+
+test.on('connection', function (socket) {
+  console.log("siema");
+  socket.on('join', function(groupId) {
+    console.log(groupId + " chat joined");
+    // Join the appropriate namespace based on the group ID
+      socket.on('chat message', (msg) => {
+        // Emit the received message to all clients within the namespace
+        test.emit('chat message', msg);
+      });
+  });
+})
+
+//////////////////////////////////////////////////////////////
+
 app.use(gameDetails);
 app.use(bggAPI);
-
 
 app.use(session({
   store: new PgSession({
@@ -471,6 +499,7 @@ app.get('/games/category/:category', async (req, res) => {
 app.get('/current-user', async (req, res) => {
   interface MinimalUser {
     id: number;
+    username: string;
   }
   const user = req.user as MinimalUser | undefined;
   if (!user) {
@@ -1020,6 +1049,10 @@ app.delete('/delete-group/:groupId', async (req, res) => {
 });
 
 
-http.createServer(app).listen(PORT, () => {
+server.listen(3000, () => {
   console.log(`Server listening on port ${PORT}`);
-});
+})
+
+// http.createServer(app).listen(PORT, () => {
+//   console.log(`Server listening on port ${PORT}`);
+// });

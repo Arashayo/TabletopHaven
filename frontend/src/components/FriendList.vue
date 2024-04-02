@@ -4,7 +4,7 @@
       <div class="row section">
         <h4>Search Users</h4>
         <div class="col m7">
-          <form @submit.prevent="searchBoardGames(searchQuery)">
+          
             <div class="input-field center-align search-bar-container" ref="searchContainer">
                 <i class="material-icons" style="margin-left: 10px;">search</i>
                 <input v-model="searchQuery" class="input-search" id="search" type="search" @input="debouncedOnChange" required>
@@ -20,7 +20,7 @@
                   </ul>
                 </div>
             </div>
-          </form>
+          
         </div>
       </div>
       <div class="row section">

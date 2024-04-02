@@ -43,11 +43,29 @@
                   </ul>
                 </div>
 
-                <div class="col m7">
-                  <h4>Group Chat</h4>
-                  <div class="chat-container">
-                    <!-- Chat messages  -->
-                  </div>
+                <div class="card mt-3">
+      <div class="card-body">
+          <div class="card-title">
+              <h3>Chat Group</h3>
+          </div>
+          <div class="card-body">
+              <div class="messages">
+                <div v-for="(message, index) in messages" :key="index" class="message">{{ message }}</div>
+              </div>
+          </div>
+      </div>
+                    <div class="card-footer">
+                        <form @submit.prevent="sendMessage">
+                                <input disabled="true">
+                                <label for="user">User:</label>
+                                <input type="text" v-model="user" class="form-control" disabled="true">
+                            <div class="gorm-group pb-3">
+                                <label for="message">Message:</label>
+                                <input type="text" v-model="message" class="form-control">
+                            </div>
+                            <button type="submit" class="btn btn-success">Send</button>
+                        </form>
+                    </div>
                 </div>
               </div>
             </div>
@@ -78,11 +96,17 @@
 <script>
 import axios from 'axios';
 import GameCard from './SmallGameCard.vue';
+import io from 'socket.io-client';
 
 export default {
   components: { GameCard },
   data() {
     return {
+      user: '',
+      message: '',
+      messages: [],
+      socket: null,
+      groupId: null,
       userId: null,
       groupName: '',
       members: [],
@@ -113,8 +137,17 @@ export default {
 
   async created() {
     try {
+      const groupId = this.$route.params.groupId;
+      this.socket = io('http://localhost:3000/group/3'); // Connect to the server
+    this.socket.on('connect', () => {
+      console.log('Connected to Socket.IO server.');
+      this.socket.emit('join', groupId); // Emit 'join' event with group ID
+    });
       await this.fetchCurrentUserId();
+      await this.fetchCurrentUserData();
       await this.fetchGroupDetails();
+      this.joinNamespace();
+      console.log('Socket.IO connection established successfully.');
     } catch (error) {
       console.error('Error in created hook:', error);
     }
@@ -135,6 +168,32 @@ export default {
   },
 
   methods: {
+    sendMessage() {
+      if (!this.socket) {
+        console.error('Socket.IO connection is not established.');
+        return;
+      }
+
+      if (this.message.trim() !== '') { // Check if message is not empty
+        // Emit 'chat message' event with message content
+        this.socket.emit('chat message', this.message);
+        // Clear the message input after sending
+        this.message = '';
+      }
+    },
+
+    listenForMessages() {
+      this.socket.on('chat message', (msg) => {
+        // Push the received message to the messages array
+        this.messages.push(msg);
+      });
+    },
+
+    joinNamespace()
+    {
+      this.socket.emit('join', this.$route.params.groupId);
+    },
+
     async applyFilters() {
       const invalidTimeFilter = this.minPlayTimeFilter !== null && this.maxPlayTimeFilter !== null && 
                                 this.minPlayTimeFilter > this.maxPlayTimeFilter;
@@ -179,6 +238,15 @@ export default {
       }
     },
 
+    async fetchCurrentUserData() {
+      try {
+        const response = await axios.get('http://localhost:3000/user-shelf', { withCredentials: true });
+        this.user = response.data.username;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
+    },
+
     async fetchCurrentUserId() {
       try {
         const response = await axios.get('http://localhost:3000/current-user', { withCredentials: true });
@@ -216,6 +284,10 @@ export default {
     toggleManageMode() {
       this.manageMode = !this.manageMode;
     },
+  },
+  mounted() {
+    // Call the method to listen for incoming messages
+    this.listenForMessages();
   }
 };
 </script>
